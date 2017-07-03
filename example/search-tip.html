@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+     <div class="button-group">
+      <label for="search">搜索关键字</label>
+      <input type="text" placeholder="搜索" id="search-input">
+    </div>
+
+</div>
+<script>
+    var map = new AMap.Map("mapContainer", {
+        resizeEnable: true
+    });
+    var placeSearch;
+     map.plugin(["AMap.Autocomplete","AMap.PlaceSearch"],function() {
+         //输入提示
+        var auto = new AMap.Autocomplete({
+            input: "search-input"
+        });
+
+        // 构造地点查询类
+        placeSearch = new AMap.PlaceSearch({
+           map: map
+        });
+
+        // 地图 事件 监听
+        AMap.event.addListener(auto,'select',select_callback)
+
+    });
+
+    function select_callback(e){
+      console.log(e)
+
+       placeSearch.setCity(e.poi.adcode);
+       placeSearch.search(e.poi.name);  //关键字查询查询
+    }
+</script>
+</body>
+</html>

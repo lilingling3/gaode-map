@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/jquery.range.css"/>
+    <script src="http://cache.amap.com/lbs/static/jquery-1.9.1.js"></script>
+    <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script src="http://cache.amap.com/lbs/static/jquery.range.js"></script>
+
+
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="tip" class="button-group">
+    点:
+    X:<input type="text" name="x" id='lngX' value="116.39742"/>
+    Y:<input type="text" name="y" id='latY' value="39.909325"/>
+    <br>
+    时间：
+    <input type="hidden" id="t" class="single-slider" value="30" />
+    <br>
+    交通类型:
+    <select name="v" id="v">
+        <option value ="SUBWAY,BUS">地铁+公交</option>
+        <option value ="SUBWAY">地铁</option>
+        <option value ="BUS">公交</option>
+    </select>
+    <input type="button" class="button" value="生活圈" onClick="javascript:addPolygon()"/>
+    <input type="button" class="button" value="清空" onClick="javascript:delPolygon()"/>
+</div>
+
+</div>
+<script>
+
+var map = new AMap.Map("mapContainer", {
+    resizeEnable: true,
+    center: [116.397428, 39.90923],//地图中心点
+    zoom: 18 //地图显示的缩放级别
+});
+
+map.plugin(["AMap.ArrivalRange"],function() {
+    bus_circle()
+});
+
+function bus_circle(){
+    map.on( 'click', getLnglat);
+    function getLnglat(e) {
+        var lngX=$("#lngX");
+        var latY=$("#latY");
+        lngX.val(e.lnglat.getLng());
+        latY.val(e.lnglat.getLat());
+
+        addCenterMarker(e.lnglat.getLng(),e.lnglat.getLat());
+
+        addPolygon();
+    }
+
+    function addCenterMarker(x,y){
+        if(centerMarker){
+            centerMarker.setMap(null);
+        }
+        centerMarker= new AMap.Marker({
+            map: map,
+            position: [x,y]
+        });
+    }
+    var arrivalRange = new AMap.ArrivalRange(), x, y, t, v,centerMarker,polygonArray=[];
+    //添加多边形覆盖物
+    function addPolygon() {
+        x=$("input[name='x']").val();
+        y=$("input[name='y']").val();
+        t=$("#t").val();
+        v=$("#v").val();
+        addCenterMarker(x,y);
+        arrivalRange.search([x,y],t, function(status,result){
+            delPolygon();
+            if(result.bounds){
+                for(var i=0;i<result.bounds.length;i++){
+                   var polygon = new AMap.Polygon({
+                        map:map,
+                        fillColor:"#3366FF",
+                        fillOpacity:"0.4",
+                        strokeColor:"#00FF00",
+                        strokeOpacity:"0.5",
+                        strokeWeight:1
+                    });
+                    polygon.setPath(result.bounds[i]);
+                    polygonArray.push(polygon);
+                }
+                map.setFitView();
+            }
+        },{
+            policy:v
+        });
+    }
+
+    function delPolygon(){
+        map.remove(polygonArray);
+        polygonArray=[];
+    }
+
+    var isChanged=false;
+    $(function(){
+        $('.single-slider').jRange({
+            onstatechange: function() {
+                isChanged=true;
+            },
+            from: 1,
+            to: 60,
+            step: 1,
+            scale: [1,15,30,45,60],
+            format: '%s',
+            width: 400,
+            showLabels: true,
+            showScale: true
+        });
+    });
+    addPolygon();
+    window.setInterval(function(){//防止在移动滑动条时频繁触发请
+            if(isChanged){
+               addPolygon();
+               isChanged=false;
+           }
+    },1000)
+}
+
+
+</script>
+</body>
+</html>

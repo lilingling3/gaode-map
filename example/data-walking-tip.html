@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/WalkingRender1230.js"></script>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/AMap.WalkingRender1120.css"/>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+     <!--<div id="tip">
+        <span id="result"> 可拖拽 试试</span>
+    </div>-->
+
+</div>
+<script>
+    // 基本地图 加载
+    var map;
+    map = new AMap.Map("mapContainer", {
+        resizeEnable: true,
+    });
+
+    // 地图 拖拽 插件
+    map.plugin("AMap.Driving", function() {
+        dragData()
+    });
+
+    function dragData(){
+     var walking = new AMap.Walking(); //构造路线导航类
+
+    //根据起终点坐标规划步行路线，您如果想修改结果展现效果，请参考页面：http://lbs.amap.com/fn/css-style/
+    walking.search(new AMap.LngLat(116.464996,39.971433), new AMap.LngLat(116.396034,39.923271), function(status, result){
+          if(status === 'complete'){
+              (new Lib.AMap.WalkingRender()).autoRender({
+                  data: result,
+                  map: map,
+                  panel: "panel"
+              });
+              }
+          });
+    }
+
+
+</script>
+</body>
+</html>

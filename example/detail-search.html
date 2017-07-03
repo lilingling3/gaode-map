@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+
+
+</div>
+<script>
+
+  // setMap(116.397428, 39.90923);
+  // var map;
+
+  // // 根据经纬度 设置 地图
+  // function setMap(lng,lat){
+  //       map = new AMap.Map('mapContainer', {
+  //           // 设置中心点
+  //           center:[lng,lat],
+  //           // 设置缩放级别
+  //           zoom: 16,
+  //           // 是否可改变
+  //           resizeEnable: true,
+  //           // 可拖拽
+  //           // dragEnable: true,
+  //           // // 键盘事件
+  //           // keyboardEnable: true,
+  //           // // 双击放大
+  //           // doubleClickZoom: true,
+  //           // 热点
+  //            isHotspot: true
+  //       });
+  //       //地图中添加地图操作ToolBar插件添加 中心点图标
+  //       map.plugin(["AMap.ToolBar"],function() {
+  //           var toolBar = new AMap.ToolBar();
+  //           map.addControl(toolBar);
+  //       });
+  //       var markers = [];
+  //       addMarker(lng,lat);
+  //       function addMarker(lng,lat){
+  //           marker = new AMap.Marker({
+  //               icon:"../images/marker.png",
+  //               position:new AMap.LngLat(lng,lat)
+  //           });
+  //           marker.setMap(map);  //在地图上添加点
+  //           markers.push(marker);
+  //       }
+
+  // }
+
+     var map = new AMap.Map("mapContainer", {
+        resizeEnable: true
+    });
+    AMap.service(["AMap.PlaceSearch"], function() {
+        var placeSearch = new AMap.PlaceSearch();// 构造地点查询类
+        placeSearch.getDetails('B000A83U0P',function(status, result){
+            if (status === 'complete' && result.info === 'OK') {
+                placeSearch_CallBack(result);
+             }
+        })
+
+    });
+
+     var infoWindow = new AMap.InfoWindow({
+        autoMove: true,
+        offset: {x: 0, y: -30}
+    });
+
+
+    function placeSearch_CallBack(data){
+        var poiArr = data.poiList.pois;
+        // 添加marker
+        var marker = new AMap.Marker({
+            map: map,
+            position: poiArr[0].location
+        });
+
+        map.setCenter(marker.getPosition());
+        // 设置 信息
+        infoWindow.setContent(createContent(poiArr[0]));
+	    	infoWindow.open(map, marker.getPosition());
+    }
+    // 添加信息窗体 的内容
+    function createContent(poi){
+       var s = [];
+        s.push("<b>名称：" + poi.name+"</b>");
+        s.push("地址：" + poi.address);
+        s.push("电话：" + poi.tel);
+        s.push("类型：" + poi.type);
+        return s.join("<br>");
+    }
+
+
+</script>
+</body>
+</html>

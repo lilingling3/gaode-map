@@ -47,10 +47,7 @@
     <div id="mapContainer"></div>
     <div id="panel-test"></div>
 
-    <div class="button-group">
-      <label for="search">搜索关键字</label>
-      <input type="text" placeholder="搜索" id="search-input">
-    </div>
+
 </div>
 <script>
 
@@ -98,26 +95,35 @@
             pageSize: 5,
             pageIndex: 1,
             city: "010", //城市
+            //stype:'餐饮服务',
             map: map,
             panel: "panel-test"
         });
 
-        //关键字查询
-        // placeSearch.search('北京大学'); // 一个值进行检索
-         placeSearch.search('方恒国际中心｜大恒科技大厦'); // 多关键字进行检索
-        // placeSearch.search(document.getElementById('search-input').value);
+          //多边形查 设置多变形
+        var polygonArr = [//多边形覆盖物节点坐标数组
+            [116.403322, 39.920255],
+            [116.410703, 39.897555],
+            [116.402292, 39.892353],
+            [116.389846, 39.891365]
+        ];
 
-        //  AMap.event.addDomListener(document.getElementById('search-input'), 'click', function() {
-        //     var cityName = document.getElementById('search-input').value;
+        // 绘制 多边形
+        var polygon = new AMap.Polygon({
+            path: polygonArr,//设置多边形边界路径
+            strokeColor: "#FF33FF", //线颜色
+            strokeOpacity: 0.2, //线透明度
+            strokeWeight: 3,    //线宽
+            fillColor: "#1791fc", //填充色
+            fillOpacity: 0.35//填充透明度
+        });
 
-        //     if (!cityName) {
-        //         cityName = '北京市';
-        //     }
-        //      placeSearch.search(cityName);
-        //  });
+        placeSearch.searchInBounds('酒店', polygon,function(status,result){
+            console.log(status)
+            console.log(result)
+        });
+
     });
-
-
 
 </script>
 </body>

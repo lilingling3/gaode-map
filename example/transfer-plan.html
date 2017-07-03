@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/TransferRender1230.js"></script>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/AMap.TransferRender1120.css"/>
+
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+     <div id="tip">
+        <span id="result"></span>
+    </div>
+
+</div>
+<script>
+
+    var map = new AMap.Map("mapContainer", {
+        resizeEnable: true,
+        center: [116.397428, 39.90923],//地图中心点
+        zoom: 13 //地图显示的缩放级别
+    });
+    // 公交 插件
+    map.plugin(["AMap.Transfer"],function() {
+       driving_callback()
+    });
+
+    function driving_callback(){
+
+      // 1，路线规划
+
+      //   var transOptions = {
+      //     map: map,
+      //     city: '北京市',
+      //     panel: 'panel-test',
+      //     //cityd:'乌鲁木齐',
+      //     policy: AMap.TransferPolicy.LEAST_TIME
+      // };
+      // //构造公交换乘类
+      // var transfer = new AMap.Transfer(transOptions);
+      // //根据起、终点坐标查询公交换乘路线
+      // //transfer.search(new AMap.LngLat(116.291035,39.907899), new AMap.LngLat(116.427281, 39.903719));
+      //  transfer.search([
+      //    {keyword: '回龙观东大街',city:'北京'}, //第一个元素city缺省时取transOptions的city属性
+      //    {keyword: '将台站',city:'北京'}//第二个元素city缺省时取transOptions的cityd属性, //没有cityd属性时取city属性
+      //   ]);
+
+    //2，数据自我提示
+    var transferOptions = {
+        city: '北京市',
+        //cityd:'乌鲁木齐',//跨城进行公交路径规划时，目的地所在城市
+        policy: AMap.TransferPolicy.LEAST_TIME //乘车策略
+    };
+
+    //构造公交换乘类,您如果想修改结果展现效果，请参考页面：http://lbs.amap.com/fn/css-style/
+    var transfer = new AMap.Transfer (transferOptions);
+    //根据起、终点坐标查询公交换乘路线
+    transfer.search(new AMap.LngLat(116.291035,39.907899), new AMap.LngLat(116.427281, 39.903719), function(status, result){
+        if(status == 'complete'){
+            (new Lib.AMap.TransferRender()).autoRender({
+                data:result,
+                map:map,
+                panel:"panel-test"
+            });
+        }else{
+            alert(result);
+        }
+    });
+
+
+
+
+
+
+
+
+ }
+
+</script>
+</body>
+</html>
