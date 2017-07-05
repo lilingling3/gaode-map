@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+       <link rel="stylesheet" href="http://cache.amap.com/lbs/static/AMap.CloudDataSearchRender1120.css"/>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4&plugin=AMap.CloudDataSearch"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/demos/js/liteToolbar.js"></script>
+      <script type="text/javascript" src="http://cache.amap.com/lbs/static/CloudDataSearchRender1230.js"></script>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+
+.info {
+  border: solid 1px silver;
+}
+div.info-top {
+  position: relative;
+  background: none repeat scroll 0 0 #F9F9F9;
+  border-bottom: 1px solid #CCC;
+  border-radius: 5px 5px 0 0;
+}
+div.info-top div {
+  display: inline-block;
+  color: #333333;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 31px;
+  padding: 0 10px;
+}
+div.info-top img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  transition-duration: 0.25s;
+}
+div.info-top img:hover {
+  box-shadow: 0px 0px 5px #000;
+}
+div.info-middle {
+  font-size: 12px;
+  padding: 6px;
+  line-height: 20px;
+}
+div.info-bottom {
+  height: 0px;
+  width: 100%;
+  clear: both;
+  text-align: center;
+}
+div.info-bottom img {
+  position: relative;
+  z-index: 104;
+}
+span {
+  margin-left: 5px;
+  font-size: 11px;
+}
+.info-middle img {
+  float: left;
+  margin-right: 6px;
+}
+.info-title {
+  color: white;
+  font-size: 14px;
+  background-color:blue;
+  line-height: 26px;
+  padding: 0px 0 0 6px;
+  font-weight: lighter;
+  letter-spacing: 1px
+}
+.info-content {
+  font: 12px Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial;
+  padding: 4px;
+  color: #666666;
+  line-height: 23px;
+}
+.info-content img {
+  float: left;
+  margin: 3px;
+}
+.title {
+  font: 13px 'Microsoft Yahei';
+  color: #09f
+}
+.amap-info-content {
+  font-size: 12px
+}
+#panel-test {
+  position: absolute;
+  background-color: white;
+  max-height: 90%;
+  overflow-y: auto;
+  top: 10px;
+  right: 10px;
+  width: 200px;
+}
+</style>
+<body style='font-size:12px'>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+
+    <div class="button-group">
+        <!--<input id="calc" type="button" class="button" value="计算两点间距离"/>-->
+        <input id="calc" type="button" class="button" value="计算点是否在多边形内"/>
+    </div>
+   <div id="tip"></div>
+</div>
+<script>
+//初始化地图对象，加载地图
+// var map = new AMap.Map("mapContainer", {
+//     resizeEnable: true,
+//     // center: [116.397428, 39.90923],//地图中心点
+//     zoom: 12 //地图显示的缩放级别
+// });
+
+// addCloudLayer();  //叠加云数据图层
+
+// function addCloudLayer() {
+//     //加载云图层插件
+//     map.plugin('AMap.CloudDataLayer', function() {
+//         var layerOptions = {
+//             query: {keywords: '公园'},
+//             clickable: true
+//         };
+//         var cloudDataLayer = new AMap.CloudDataLayer('532b9b3ee4b08ebff7d535b4', layerOptions); //实例化云图层类
+//         cloudDataLayer.setMap(map); //叠加云图层到地图
+//         AMap.event.addListener(cloudDataLayer, 'click', function(result) {
+//             var clouddata = result.data;
+//             var photo = [];
+//             if (clouddata._image[0]) {//如果有上传的图片
+//                 photo = ['<img width=240 height=100 src="' + clouddata._image[0]._preurl + '"><br>'];
+//             }
+//             var infoWindow = new AMap.InfoWindow({
+//                 content: "<font class='title'>" + clouddata._name + "</font><hr/>" + photo.join("") + "地址：" + clouddata._address + "<br />" + "创建时间：" + clouddata._createtime + "<br />" + "更新时间：" + clouddata._updatetime,
+//                 size: new AMap.Size(0, 0),
+//                 autoMove: true,
+//                 offset: new AMap.Pixel(0, -25)
+//             });
+//             infoWindow.open(map, clouddata._location);
+//         });
+//     });
+// }
+
+// 周边检索
+// var search, center = [116.39946, 39.907629];
+// var searchOptions = {
+//       map: map,
+//       panel: 'panel-test',
+//       keywords: '公园',
+//       pageSize: 5,
+//       orderBy: '_id:ASC'
+//   };
+  //加载CloudDataSearch服务插件 周边检索
+  // AMap.service(["AMap.CloudDataSearch"], function() {
+  //     search = new AMap.CloudDataSearch('532b9b3ee4b08ebff7d535b4', searchOptions);
+  //     search.searchNearBy(center, 10000);
+  // });
+
+    //加载CloudDataSearch服务插件 多边形 检索
+    // AMap.service(["AMap.CloudDataSearch"], function() {
+    //     search = new AMap.CloudDataSearch('532b9b3ee4b08ebff7d535b4', searchOptions); //构造云数据检索类
+    //     var arr = [ //绘制多边形
+    //         [116.386414, 39.920664],
+    //         [116.411648, 39.922244],
+    //         [116.413879, 39.906708],
+    //         [116.398087, 39.904074],
+    //         [116.383667, 39.912633],
+    //         [116.386414, 39.920664]
+    //     ];
+    //     search.searchInPolygon(arr);
+    // });
+  //加载CloudDataSearch服务插件
+//  var center = new AMap.LngLat(116.39946,39.907629);
+//     var searchOptions = {
+//         keywords:'',
+//         pageIndex:1,
+//         pageSize: 10,
+//         orderBy:'_id:ASC'
+//     };
+// 	//构造云数据检索类，您如果想修改结果展现效果，请参考页面：http://lbs.amap.com/fn/css-style/
+//     var search = new AMap.CloudDataSearch('532b9b3ee4b08ebff7d535b4', searchOptions);
+//     //周边检索
+//     search.searchNearBy(center, 1500, nearBy_CallBack);
+//     var cloudDataSearchRender=new Lib.AMap.CloudDataSearchRender();
+//     function nearBy_CallBack(status,result){
+//         if(status === 'complete' && result.info === 'OK') {
+//             cloudDataSearchRender.autoRender({
+//                 cloudDataSearchInstance: search,
+//                 methodName: "searchNearBy",
+//                 methodArgumments: [center, 1500, nearBy_CallBack],
+//                 data: result,
+//                 map: map,
+//                 panel: "panel-test"
+//             });
+//         }
+//     }
+
+var map = new AMap.Map('mapContainer', {
+        resizeEnable: true,
+		center: [116.486409,39.921489],
+        zoom: 12
+    });
+    AMap.service('AMap.Weather', function() {
+        var weather = new AMap.Weather();
+        //查询实时天气信息, 查询的城市到行政级别的城市，如朝阳区、杭州市
+        weather.getLive('朝阳区', function(err, data) {
+            if (!err) {
+                var str = [];
+                str.push('<div style="color: #3366FF;">实时天气' + '</div>');
+                str.push('<div>城市/区：' + data.city + '</div>');
+                str.push('<div>天气：' + data.weather + '</div>');
+                str.push('<div>温度：' + data.temperature + '℃</div>');
+                str.push('<div>风向：' + data.windDirection + '</div>');
+                str.push('<div>风力：' + data.windPower + ' 级</div>');
+                str.push('<div>空气湿度：' + data.humidity + '</div>');
+                str.push('<div>发布时间：' + data.reportTime + '</div>');
+                var marker = new AMap.Marker({map: map, position: map.getCenter()});
+                var infoWin = new AMap.InfoWindow({
+                    content: str.join(''),
+                    offset: new AMap.Pixel(0, -20)
+                });
+                infoWin.open(map, marker.getPosition());
+                marker.on('mouseover', function() {
+                    infoWin.open(map, marker.getPosition());
+                });
+            }
+        });
+        //未来4天天气预报
+        weather.getForecast('朝阳区', function(err, data) {
+            if (err) {return;}
+            var str = [];
+            for (var i = 0,dayWeather; i < data.forecasts.length; i++) {
+                dayWeather = data.forecasts[i];
+                str.push(dayWeather.date+' <div class="weather">'+dayWeather.dayWeather+'</div> '+ dayWeather.nightTemp + '~' + dayWeather.dayTemp + '℃');
+            }
+            document.getElementById('tip').innerHTML = str.join('<br>');
+        });
+    });
+</script>
+</body>
+</html>

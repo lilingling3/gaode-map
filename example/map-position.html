@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/demos/js/liteToolbar.js"></script>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+
+.info {
+  border: solid 1px silver;
+}
+div.info-top {
+  position: relative;
+  background: none repeat scroll 0 0 #F9F9F9;
+  border-bottom: 1px solid #CCC;
+  border-radius: 5px 5px 0 0;
+}
+div.info-top div {
+  display: inline-block;
+  color: #333333;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 31px;
+  padding: 0 10px;
+}
+div.info-top img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  transition-duration: 0.25s;
+}
+div.info-top img:hover {
+  box-shadow: 0px 0px 5px #000;
+}
+div.info-middle {
+  font-size: 12px;
+  padding: 6px;
+  line-height: 20px;
+}
+div.info-bottom {
+  height: 0px;
+  width: 100%;
+  clear: both;
+  text-align: center;
+}
+div.info-bottom img {
+  position: relative;
+  z-index: 104;
+}
+span {
+  margin-left: 5px;
+  font-size: 11px;
+}
+.info-middle img {
+  float: left;
+  margin-right: 6px;
+}
+.info-title {
+  color: white;
+  font-size: 14px;
+  background-color:blue;
+  line-height: 26px;
+  padding: 0px 0 0 6px;
+  font-weight: lighter;
+  letter-spacing: 1px
+}
+.info-content {
+  font: 12px Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial;
+  padding: 4px;
+  color: #666666;
+  line-height: 23px;
+}
+.info-content img {
+  float: left;
+  margin: 3px;
+}
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+
+    <div class="button-group">
+        <!--<input id="calc" type="button" class="button" value="计算两点间距离"/>-->
+        <input id="calc" type="button" class="button" value="计算点是否在多边形内"/>
+    </div>
+   <div id="tip"></div>
+</div>
+<script>
+ //初始化地图对象，加载地图
+//  var map = new AMap.Map('mapContainer', {
+//         resizeEnable: true
+//     });
+//     //地图中添加地图操作ToolBar插件
+//     map.plugin(['AMap.ToolBar'], function() {
+//         //设置地位标记为自定义标记
+//         var toolBar = new AMap.ToolBar();
+//         map.addControl(toolBar);
+//     });
+
+var map, geolocation;
+    //加载地图，调用浏览器定位服务
+map = new AMap.Map('mapContainer', {
+        resizeEnable: true
+    });
+    map.plugin('AMap.Geolocation', function() {
+        geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB'
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+        AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+    });
+    //解析定位结果
+    function onComplete(data) {
+        var str=['定位成功'];
+        str.push('经度：' + data.position.getLng());
+        str.push('纬度：' + data.position.getLat());
+        if(data.accuracy){
+             str.push('精度：' + data.accuracy + ' 米');
+        }//如为IP精确定位结果则没有精度信息
+        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+        document.getElementById('tip').innerHTML = str.join('<br>');
+    }
+    //解析定位错误信息
+    function onError(data) {
+        document.getElementById('tip').innerHTML = '定位失败';
+    }
+
+</script>
+</body>
+</html>

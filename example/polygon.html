@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>基本地图展示</title>
+    <!--<link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>-->
+      <!--<script src="http://cache.amap.com/lbs/static/es5.min.js"></script>-->
+    <script src="http://webapi.amap.com/maps?v=1.3&key=55df9c3ffc22f19d7fc66edc5b8049e4"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/demos/js/liteToolbar.js"></script>
+</head>
+<style>
+
+#mapContainer{
+    margin-top: 2rem;
+    height: 600px;
+    width: 800px;
+    overflow: hidden;
+    position: relative;
+    background: rgb(252, 249, 242);
+    margin: 0 auto;
+}
+
+.button-group {
+	position: absolute;
+	top: 20px;
+  left: 170px;
+	font-size: 12px;
+	padding: 10px;
+}
+.map-wrap{
+  position: relative
+}
+#panel-test {
+      position: absolute;
+      background-color: white;
+      max-height: 90%;
+      overflow-y: auto;
+      top: 10px;
+      right: 10px;
+      width: 280px;
+  }
+
+#result{
+  position: absolute;
+  top: 20px;
+  left: 140px;
+}
+
+.info {
+  border: solid 1px silver;
+}
+div.info-top {
+  position: relative;
+  background: none repeat scroll 0 0 #F9F9F9;
+  border-bottom: 1px solid #CCC;
+  border-radius: 5px 5px 0 0;
+}
+div.info-top div {
+  display: inline-block;
+  color: #333333;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 31px;
+  padding: 0 10px;
+}
+div.info-top img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  transition-duration: 0.25s;
+}
+div.info-top img:hover {
+  box-shadow: 0px 0px 5px #000;
+}
+div.info-middle {
+  font-size: 12px;
+  padding: 6px;
+  line-height: 20px;
+}
+div.info-bottom {
+  height: 0px;
+  width: 100%;
+  clear: both;
+  text-align: center;
+}
+div.info-bottom img {
+  position: relative;
+  z-index: 104;
+}
+span {
+  margin-left: 5px;
+  font-size: 11px;
+}
+.info-middle img {
+  float: left;
+  margin-right: 6px;
+}
+.info-title {
+  color: white;
+  font-size: 14px;
+  background-color:blue;
+  line-height: 26px;
+  padding: 0px 0 0 6px;
+  font-weight: lighter;
+  letter-spacing: 1px
+}
+.info-content {
+  font: 12px Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial;
+  padding: 4px;
+  color: #666666;
+  line-height: 23px;
+}
+.info-content img {
+  float: left;
+  margin: 3px;
+}
+</style>
+<body>
+<div id='map-wrap'>
+    <div id="mapContainer"></div>
+    <div id="panel-test"></div>
+
+    <div class="button-group">
+        <!--<input id="calc" type="button" class="button" value="计算两点间距离"/>-->
+        <input id="calc" type="button" class="button" value="计算点是否在多边形内"/>
+    </div>
+
+</div>
+<script>
+ //初始化地图对象，加载地图
+var map = new AMap.Map("mapContainer", {
+    resizeEnable: true,
+    center: [116.397428, 39.90923],
+    zoom: 13
+});
+var lineArr = [
+    [116.368904, 39.913423],
+    [116.382122, 39.901176],
+    [116.387271, 39.912501],
+    [116.398258, 39.904600]
+];
+var polyline = new AMap.Polyline({
+    path: lineArr,          //设置线覆盖物路径
+    strokeColor: "#3366FF", //线颜色
+    strokeOpacity: 1,       //线透明度
+    strokeWeight: 5,        //线宽
+    strokeStyle: "solid",   //线样式
+    strokeDasharray: [10, 5] //补充线样式
+});
+polyline.setMap(map);
+
+var polygonArr = new Array();//多边形覆盖物节点坐标数组
+polygonArr.push([116.403322, 39.920255]);
+polygonArr.push([116.410703, 39.897555]);
+polygonArr.push([116.402292, 39.892353]);
+polygonArr.push([116.389846, 39.891365]);
+var  polygon = new AMap.Polygon({
+    path: polygonArr,//设置多边形边界路径
+    strokeColor: "#FF33FF", //线颜色
+    strokeOpacity: 0.2, //线透明度
+    strokeWeight: 3,    //线宽
+    fillColor: "#1791fc", //填充色
+    fillOpacity: 0.35//填充透明度
+});
+polygon.setMap(map);
+
+var circle = new AMap.Circle({
+    center: new AMap.LngLat("116.403322", "39.920255"),// 圆心位置
+    radius: 1000, //半径
+    strokeColor: "#F33", //线颜色
+    strokeOpacity: 1, //线透明度
+    strokeWeight: 3, //线粗细度
+    fillColor: "#ee2200", //填充颜色
+    fillOpacity: 0.35//填充透明度
+});
+circle.setMap(map);
+
+</script>
+</body>
+</html>
